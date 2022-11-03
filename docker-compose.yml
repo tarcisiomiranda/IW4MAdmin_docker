@@ -1,0 +1,42 @@
+version: "3"
+
+networks:
+  default:
+    external:
+      name: mw2
+
+services:
+  iw4x_rcon:
+    image: iw4x_rcon:1.0
+    container_name: iw4x_rcon
+    env_file: .env
+    restart: always
+    volumes:
+      - "./data:/iw4x/server/"
+      - "./data/admin:/iw4x/admin"
+    networks:
+      default:
+        ipv4_address: 192.168.255.3
+    ports:
+      - "1624:1624"
+
+# TODO - complete with server
+  iw4x_server:
+    build:
+      context: "./image/"
+    container_name: "iw4x_server"
+    image: "iw4x_server:1.0"
+    env_file: .env
+    restart: always
+    environment:
+      IW4X_ARGS: "-dedicated +set net_port ${GAMEPORT} +exec server.cfg +party_enable ${LANMODE} +map_rotate"
+    volumes:
+      - "./image/server_pink.cfg:/iw4x/server/userraw/server.cfg"
+      - "./image/init.sh:/iw4x/init.sh"
+      - "./data:/iw4x/server/"
+    networks:
+      default:
+        ipv4_address: 192.168.255.2
+    ports:
+      - "28961:28961"
+      - "28961:28961/udp"

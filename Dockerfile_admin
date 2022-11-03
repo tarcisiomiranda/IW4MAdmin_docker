@@ -1,0 +1,58 @@
+FROM ubuntu:18.04
+
+RUN  apt-get update \
+  && apt-get install -y wget \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN wget https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb\
+    -O packages-microsoft-prod.deb \
+    && dpkg -i packages-microsoft-prod.deb
+
+RUN apt-get update; \
+    apt-get install -y apt-transport-https && \
+    apt-get update && \
+    apt-get install -y dotnet-sdk-3.1
+
+RUN apt-get update; \
+    apt-get install -y apt-transport-https && \
+    apt-get update && \
+    apt-get install -y aspnetcore-runtime-3.1
+
+RUN apt-get install -y dotnet-runtime-3.1
+
+RUN rm -rf /var/lib/apt/lists/*
+
+WORKDIR /iw4x
+
+COPY StartIW4MAdmin.sh /iw4x/admin/StartIW4MAdmin.sh
+
+RUN chmod +x /iw4x/admin/StartIW4MAdmin.sh
+
+RUN useradd -ms /bin/bash iw4x
+
+USER iw4x
+
+WORKDIR /iw4x/admin
+
+EXPOSE 1624
+
+CMD ["/bin/bash", "-e", "StartIW4MAdmin.sh"]
+
+
+# Install dotnet
+#RUN apk add bash icu-libs krb5-libs libgcc libintl libssl1.1 libstdc++ zlib
+#RUN apk add libgdiplus --repository https://dl-3.alpinelinux.org/alpine/edge/testing/
+#RUN wget --quiet https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh \
+#    && chmod +x dotnet-install.sh \
+#    && sh dotnet-install.sh -c 3.1 \
+#    && sh dotnet-install.sh -c 3.1 --runtime aspnetcore \
+#    && dotnet --version
+
+#RUN dotnet --version
+
+#   && rm -rf /var/cache/apk/* /tmp/* \
+# 	#   2 step
+#   && wget --quiet https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -O /usr/sbin/wait-for-it.sh \
+#   && chmod +x /usr/sbin/wait-for-it.sh
+
+# end install dotnet
